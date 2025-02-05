@@ -17,6 +17,10 @@ RECIPIENT_EMAILS = [
     
 ]
 
+@app.route("/api/test", methods=["GET"])
+def handle_test():
+
+    return jsonify({"message": "API works"})
 
 @app.route('/api/create-business', methods=['POST'])
 def handle_create_business():
