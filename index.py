@@ -73,10 +73,8 @@ def handle_register():
 
         #save data to DB
         
-        return jsonify(user)
-    else:
-        print(user)
-
+    return jsonify(user)
+    
 @app.route('/api/login', methods=['POST'])
 def handle_login():
 
