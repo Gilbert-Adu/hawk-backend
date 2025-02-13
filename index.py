@@ -63,7 +63,7 @@ def handle_register():
 
     
     user = create_user(name, email, password)
-    if 'Item' in user:
+    if 'Items' in user:
         SUBJECT = "🤝 A NEW USER JOINED"
         BODY = f"A user named {name} created an account. Their email is {email}"
 

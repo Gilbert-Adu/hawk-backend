@@ -70,7 +70,7 @@ def create_user(name, email, password):
 
         print("response: ", response)
 
-        if 'Item' in response:
+        if 'Items' in response:
             print("user already exists")
             return {"message": "User already exists", "status":"error"}
         # Data to store in the table
