@@ -1,6 +1,7 @@
 import boto3 # type: ignore
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError # type: ignore
 from boto3.dynamodb.conditions import Attr # type: ignore
+from emailer import send_email
 
 import uuid 
 import bcrypt # type: ignore
@@ -24,6 +25,13 @@ leads_table = dynamodb.Table('Leads')
 payments_table = dynamodb.Table('Payments')
 business_table = dynamodb.Table('Business')
 
+RECIPIENT_EMAILS = [
+    os.getenv('ADMIN_EMAIL'),
+    os.getenv('SOCIAL_HAWK')
+    
+]
+SENDER_EMAIL = "kobbyenos.770@gmail.com"
+SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
 
 def create_business(name, email, phone, businessName, businessLocation, services, shipping, fastest_reach):
     try:
@@ -70,7 +78,7 @@ def create_user(name, email, password):
 
         print("response: ", response)
 
-        if 'Items' in response:
+        if len(response['Items']) > 0:
             print("user already exists")
             return {"message": "User already exists", "status":"error"}
         # Data to store in the table
@@ -86,7 +94,13 @@ def create_user(name, email, password):
         table.put_item(
             Item=item_data,
             ConditionExpression="attribute_not_exists(email)"
-            )
+        )
+        SUBJECT = "🤝 A NEW USER JOINED"
+        BODY = f"A user named {name} created an account. Their email is {email}"
+
+        for item in RECIPIENT_EMAILS:
+            send_email(SENDER_EMAIL, SENDER_PASSWORD, item, SUBJECT, BODY)
+
         return item_data
 
     except NoCredentialsError:

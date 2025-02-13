@@ -63,14 +63,6 @@ def handle_register():
 
     
     user = create_user(name, email, password)
-    if 'Items' in user:
-        SUBJECT = "🤝 A NEW USER JOINED"
-        BODY = f"A user named {name} created an account. Their email is {email}"
-
-        for item in RECIPIENT_EMAILS:
-            send_email(SENDER_EMAIL, SENDER_PASSWORD, item, SUBJECT, BODY)
-
-
         #save data to DB
         
     return jsonify(user)
