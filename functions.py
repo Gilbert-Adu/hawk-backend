@@ -76,32 +76,35 @@ def create_user(name, email, password):
             FilterExpression=boto3.dynamodb.conditions.Attr('email').eq(email)
         )
 
+        print("response_length: ", response['Count'])
         print("response: ", response)
 
-        if len(response['Items']) > 0:
+        if response['Count'] > 0:
             print("user already exists")
             return {"message": "User already exists", "status":"error"}
         # Data to store in the table
-        item_data = {
+        else:
+            item_data = {
             'id': str(uuid.uuid4()),
             'name': name,  # Partition key
             'email': email,
             'password': hashed_password_str,
             'Subscribed': False
-        }
+            }
 
-        # Put the item in the table
-        table.put_item(
-            Item=item_data,
-            ConditionExpression="attribute_not_exists(email)"
-        )
-        SUBJECT = "🤝 A NEW USER JOINED"
-        BODY = f"A user named {name} created an account. Their email is {email}"
+            # Put the item in the table
+            table.put_item(
+                Item=item_data,
+                ConditionExpression="attribute_not_exists(email)"
+            )
+            SUBJECT = "🤝 A NEW USER JOINED"
+            BODY = f"A user named {name} created an account. Their email is {email}"
 
-        for item in RECIPIENT_EMAILS:
-            send_email(SENDER_EMAIL, SENDER_PASSWORD, item, SUBJECT, BODY)
+            for item in RECIPIENT_EMAILS:
+                send_email(SENDER_EMAIL, SENDER_PASSWORD, item, SUBJECT, BODY)
 
-        return item_data
+            return item_data
+
 
     except NoCredentialsError:
         print("AWS credentials not found.")
@@ -283,33 +286,4 @@ def change_payment_status(email, status):
     partition_key_value = item['id']
 
     # Step 2: Update the subscribed field
-    table.update_item(
-        Key={'id': partition_key_value},
-        UpdateExpression='SET Subscribed = :Subscribed',
-        ExpressionAttributeValues={':Subscribed': status}
-    )
-
-    payments_data = {
-            'id': str(uuid.uuid4()),
-            'user_email': email,
-            'status': status,  # Partition key
-            'created_at': str(datetime.today().date()),
-
-    }
-
-        # Put the item in the table
-    payments_response = payments_table.put_item(Item=payments_data)
-    print("User subscription updated successfully.")
-    return response
-
-
-
-
-
- 
-
-
-
-
-
-    
+    table.update_item
