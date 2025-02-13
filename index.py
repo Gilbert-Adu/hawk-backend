@@ -63,16 +63,19 @@ def handle_register():
 
     
     user = create_user(name, email, password)
-    SUBJECT = "🤝 A NEW USER JOINED"
-    BODY = f"A user named {name} created an account. Their email is {email}"
+    if 'Item' in user:
+        SUBJECT = "🤝 A NEW USER JOINED"
+        BODY = f"A user named {name} created an account. Their email is {email}"
 
-    for item in RECIPIENT_EMAILS:
-        send_email(SENDER_EMAIL, SENDER_PASSWORD, item, SUBJECT, BODY)
+        for item in RECIPIENT_EMAILS:
+            send_email(SENDER_EMAIL, SENDER_PASSWORD, item, SUBJECT, BODY)
 
 
-    #save data to DB
-    
-    return jsonify(user)
+        #save data to DB
+        
+        return jsonify(user)
+    else:
+        print(user)
 
 @app.route('/api/login', methods=['POST'])
 def handle_login():
@@ -228,5 +231,5 @@ def handle_send_email():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(port=5000)
     print("up on 5000")

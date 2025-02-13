@@ -64,7 +64,15 @@ def create_user(name, email, password):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         hashed_password_str = base64.b64encode(hashed_password).decode('utf-8')
 
+        response = table.scan(
+            FilterExpression=boto3.dynamodb.conditions.Attr('email').eq(email)
+        )
 
+        print("response: ", response)
+
+        if 'Item' in response:
+            print("user already exists")
+            return {"message": "User already exists", "status":"error"}
         # Data to store in the table
         item_data = {
             'id': str(uuid.uuid4()),
@@ -75,7 +83,10 @@ def create_user(name, email, password):
         }
 
         # Put the item in the table
-        response = table.put_item(Item=item_data)
+        table.put_item(
+            Item=item_data,
+            ConditionExpression="attribute_not_exists(email)"
+            )
         return item_data
 
     except NoCredentialsError:
